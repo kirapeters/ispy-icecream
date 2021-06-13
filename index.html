@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+
+<body>
+
+    <script>
+        const SCREEN_WIDTH = 800;
+        const SCREEN_HEIGHT = 600;
+
+        var config = {
+            type: Phaser.AUTO,
+            width: SCREEN_WIDTH,
+            height: SCREEN_HEIGHT,
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        // to handle the score
+        var score = 0;
+        var scoreText;
+
+        function foundItem() {
+            score += 1;
+            scoreText.setText('Score: ' + score);
+
+            let randIndex = Math.floor(Math.random() * objNames.length);
+            promptText.setText('iSpy with my little eye, a ' + objNames[randIndex]);
+        }
+
+        // to handle different things to find on the screen
+        var objToFind = ''
+        var promptText;
+
+        // for the different objects on the screen
+        var objNames = ['icecream', 'surfboard', 'lilguy'];
+
+        // game setup
+        function preload() {
+            this.load.image('background', 'assets/background1.png');
+
+            // load the objects
+            for(let obj of objNames) {
+                this.load.image(obj, 'assets/' + obj + '.png');
+            }
+        }
+
+        function create() {
+            // 400, 300 is where the image is placed on the screen
+            this.add.image(400, 300, 'background');
+
+            // add the sprites of the game
+            var sprites = []
+            for(let obj of objNames) {
+                // get random x and y values
+                x = Math.floor(Math.random() * 701) + 50;
+                y = Math.floor(Math.random() * 501) + 50;
+                let newSprite = this.add.sprite(x, y, obj).setInteractive();
+                sprites.push(newSprite);
+            }
+
+            for (let sprite of sprites) {
+                sprite.on('pointerdown', function (pointer) {
+                    this.setTint(0x0000ff);
+                    foundItem();
+                });
+
+                sprite.on('pointerout', function (pointer) {
+                    this.clearTint();
+                });
+
+                sprite.on('pointerup', function (pointer) {
+                    this.clearTint();
+                });
+            }
+
+            // for the score
+            scoreText = this.add.text(16, 16, 'score: 0', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+
+            // for the score
+            promptText = this.add.text(16, SCREEN_HEIGHT - 48, 'iSpy with my little eye, a ', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+        }
+
+        function update() {}
+    </script>
+
+</body>
+
+</html>
