@@ -11,6 +11,9 @@
         const SCREEN_WIDTH = 800;
         const SCREEN_HEIGHT = 600;
 
+        /***************************
+         * Sets up game screen configuration
+         * **************************/
         var config = {
             type: Phaser.AUTO,
             width: SCREEN_WIDTH,
@@ -22,67 +25,104 @@
             }
         };
 
+        /*************************************
+         * Variables to be used in the game
+         * ***********************************/
         var game = new Phaser.Game(config);
 
         // to handle the score
         var score = 0;
         var scoreText;
 
-        function setRandomItem() {
-            let randIndex = Math.floor(Math.random() * objNames.length);
-            this.focusItem = objNames[randIndex];
-            promptText.setText('iSpy with my little eye, a ' + objNames[randIndex]);
-        }
-
-        function foundItem() {
-            score += 1;
-            scoreText.setText('Score: ' + score);
-
-            setRandomItem();
-
-            const index = array.indexOf(sprite);
-            if (index > -1) {
-                array.splice(index, 1);
-            }
-        }
-
         // to handle different things to find on the screen
         var objToFind = ''
         var promptText;
 
         // for the different objects on the screen
-        var objNames = ['surfboard', 'cat', 'elephant', 'lemon', 'mushroom', 'UFO', 'cactus', 'cottoncandy', 'cupcake'];
-        var sprites = [];
+        var allObjNames = ['cactus', 'cat', 'cottoncandy','cupcake','elephant','flower','fudgesundae','lemon','lollipop','mushroom','musicnote','octopus','pumpkin','snail','strawberry','surfboard','UFO'];
+        var activeObjNames = [];
+        var sprites = {};
         var focusItem = '';
 
-        // game setup
+        /*************************************
+         * Sets a random item to be found on the board
+         * ************************************/
+        function setRandomItem() {
+            let randIndex = Math.floor(Math.random() * activeObjNames.length);
+            focusItem = activeObjNames[randIndex];
+            promptText.setText('iSpy with my little eye, a ' + activeObjNames[randIndex]);
+        }
+
+        /**************************************
+         * If the focus item is found then remove
+         * the sprite and update the score
+         * *************************************/
+        function foundItem(spriteName) {
+            if (focusItem === spriteName) {
+                // remove from the list of sprite names
+                const index = activeObjNames.indexOf(spriteName);
+                if (index > -1) {
+                    activeObjNames.splice(index, 1);
+                }
+
+                // kill the sprite so it no longer displays on the screen
+                sprites[spriteName].destroy();
+
+                // update score
+                score += 1;
+                scoreText.setText('Score: ' + score);
+                setRandomItem();
+            }
+
+            console.log("Found item!");
+        }
+
+        /**********************************
+         * Preloads images and data to be used in the game
+         * *********************************/
         function preload() {
             this.load.image('background', 'assets/icecreamshopbackground.png');
 
+             // randomize 10 objects to be used as sprites
+             for (let i = 0; i < 10; i++) {
+                let randInd = Math.floor(Math.random() * allObjNames.length);
+                activeObjNames.push(allObjNames[randInd]);
+                allObjNames.splice(randInd, 1);
+            }
+            
             // load the objects
-            for(let obj of objNames) {
+            for(let obj of activeObjNames) {
                 this.load.image(obj, 'assets/' + obj + '.png');
             }
         }
 
+        /****************************************
+         * Creates and places sprites and other resources
+         * to be used in the game
+         * ***************************************/
         function create() {
             // 400, 300 is where the image is placed on the screen
             this.add.image(400, 300, 'background');
 
             // add the sprites of the game
-            for(let obj of objNames) {
+            for(let obj of activeObjNames) {
                 // get random x and y values
                 x = Math.floor(Math.random() * 701) + 50;
                 y = Math.floor(Math.random() * 501) + 50;
                 let newSprite = this.add.sprite(x, y, obj).setInteractive();
                 newSprite.setScale(.8);
-                sprites.push(newSprite);
+                sprites[obj] = newSprite;
             }
 
-            for (let sprite of sprites) {
+            // sets up the ability to click a sprite
+            for (let entry of Object.entries(sprites)) {
+                // console.log(sprite);
+                let spriteName = entry[0];
+                let sprite = entry[1];
+
                 sprite.on('pointerdown', function (pointer) {
                     this.setTint(0x0000ff);
-                    foundItem();
+                    foundItem(spriteName);
                 });
 
                 sprite.on('pointerout', function (pointer) {
@@ -111,7 +151,11 @@
             setRandomItem();
         }
 
-        function update() {}
+        function update() {
+            if (activeObjNames.length === 0) {
+                // game over screen
+            }
+        }
     </script>
 
 </body>
