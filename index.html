@@ -37,6 +37,7 @@
         // to handle different things to find on the screen
         var objToFind = ''
         var promptText;
+        var endScreen;
 
         // for the different objects on the screen
         var allObjNames = ['cactus', 'cat', 'cottoncandy','cupcake','elephant','flower','fudgesundae','lemon','lollipop','mushroom','musicnote','octopus','pumpkin','snail','strawberry','surfboard','UFO'];
@@ -82,16 +83,10 @@
          * *********************************/
         function preload() {
             this.load.image('background', 'assets/icecreamshopbackground.png');
+            this.load.image('endScreen', 'assets/youwin.png');
 
-             // randomize 10 objects to be used as sprites
-             for (let i = 0; i < 10; i++) {
-                let randInd = Math.floor(Math.random() * allObjNames.length);
-                activeObjNames.push(allObjNames[randInd]);
-                allObjNames.splice(randInd, 1);
-            }
-            
             // load the objects
-            for(let obj of activeObjNames) {
+            for(let obj of allObjNames) {
                 this.load.image(obj, 'assets/' + obj + '.png');
             }
         }
@@ -103,6 +98,17 @@
         function create() {
             // 400, 300 is where the image is placed on the screen
             this.add.image(400, 300, 'background');
+
+            // create win screen and hide it
+            endScreen = this.add.image(400, 300, 'endScreen');
+            endScreen.visible = false;
+
+            // randomize 10 objects to be used as sprites
+            for (let i = 0; i < 10; i++) {
+                let randInd = Math.floor(Math.random() * allObjNames.length);
+                activeObjNames.push(allObjNames[randInd]);
+                allObjNames.splice(randInd, 1);
+            }
 
             // add the sprites of the game
             for(let obj of activeObjNames) {
@@ -153,7 +159,9 @@
 
         function update() {
             if (activeObjNames.length === 0) {
-                // game over screen
+                // this.add.image(400, 300, 'endScreen');
+                endScreen.visible = true;
+                promptText.setText('');
             }
         }
     </script>
