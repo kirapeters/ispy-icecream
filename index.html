@@ -28,12 +28,22 @@
         var score = 0;
         var scoreText;
 
+        function setRandomItem() {
+            let randIndex = Math.floor(Math.random() * objNames.length);
+            this.focusItem = objNames[randIndex];
+            promptText.setText('iSpy with my little eye, a ' + objNames[randIndex]);
+        }
+
         function foundItem() {
             score += 1;
             scoreText.setText('Score: ' + score);
 
-            let randIndex = Math.floor(Math.random() * objNames.length);
-            promptText.setText('iSpy with my little eye, a ' + objNames[randIndex]);
+            setRandomItem();
+
+            const index = array.indexOf(sprite);
+            if (index > -1) {
+                array.splice(index, 1);
+            }
         }
 
         // to handle different things to find on the screen
@@ -41,7 +51,9 @@
         var promptText;
 
         // for the different objects on the screen
-        var objNames = ['icecream', 'surfboard', 'lilguy', 'cat', 'elephantpng', 'lemon', 'mushroom', 'UFO'];
+        var objNames = ['surfboard', 'cat', 'elephant', 'lemon', 'mushroom', 'UFO', 'cactus', 'cottoncandy', 'cupcake'];
+        var sprites = [];
+        var focusItem = '';
 
         // game setup
         function preload() {
@@ -58,12 +70,12 @@
             this.add.image(400, 300, 'background');
 
             // add the sprites of the game
-            var sprites = []
             for(let obj of objNames) {
                 // get random x and y values
                 x = Math.floor(Math.random() * 701) + 50;
                 y = Math.floor(Math.random() * 501) + 50;
                 let newSprite = this.add.sprite(x, y, obj).setInteractive();
+                newSprite.setScale(.8);
                 sprites.push(newSprite);
             }
 
@@ -93,6 +105,10 @@
                 fontSize: '32px',
                 fill: '#000'
             });
+
+
+            // load first random item
+            setRandomItem();
         }
 
         function update() {}
